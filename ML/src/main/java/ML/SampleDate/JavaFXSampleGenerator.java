@@ -64,15 +64,15 @@ public class JavaFXSampleGenerator extends SampleDataGenerator {
     private void generateEffects() {
         ArrayList<EffectHelper> effectHelpers = new ArrayList<>();
         effectHelpers.add((rand) -> new Glow(rand.nextDouble()));
-        effectHelpers.add(rand1 -> new ColorAdjust(rand1.nextDouble(), rand1.nextDouble(), rand1.nextDouble(), rand1.nextDouble()));
+        effectHelpers.add(rand1 -> new ColorAdjust(rand1.nextDouble() * 0.5 + 0.5, rand1.nextDouble() * 0.5 + 0.5, rand1.nextDouble() * 0.5, rand1.nextDouble()));
         effectHelpers.add(rand1 -> new Blend(BlendMode.values()[(int) (rand1.nextDouble() * BlendMode.values().length)]));
-        effectHelpers.add(rand1 -> new Bloom(rand1.nextDouble()));
-        effectHelpers.add(rand1 -> new BoxBlur(rand1.nextDouble(), rand1.nextDouble(), (int) (rand1.nextDouble() * 10)));
-        effectHelpers.add(rand1 -> new GaussianBlur(rand1.nextDouble() * 15));
-        effectHelpers.add(rand1 -> new Reflection(rand1.nextDouble() * 15, rand1.nextDouble(), rand1.nextDouble(), rand1.nextDouble()));
-        effectHelpers.add(rand1 -> new SepiaTone(rand1.nextDouble()));
-        effectHelpers.add(rand1 -> new Shadow(BlurType.values()[(int) (rand1.nextDouble() * BlurType.values().length)], Color.color(rand1.nextDouble(), rand1.nextDouble(), rand1.nextDouble(), rand1.nextDouble()), rand1.nextDouble() * 15));
-        effectHelpers.add(rand1 -> new DropShadow(BlurType.values()[(int) (rand1.nextDouble() * BlurType.values().length)], Color.color(rand1.nextDouble(), rand1.nextDouble(), rand1.nextDouble(), rand1.nextDouble()), rand1.nextDouble() * 15,rand1.nextDouble() * 15, rand1.nextDouble() * 15, rand1.nextDouble() * 15));
+        effectHelpers.add(rand1 -> new Bloom(rand1.nextDouble()* 15));
+        effectHelpers.add(rand1 -> new BoxBlur(rand1.nextDouble() * 2, rand1.nextDouble()* 2, (int) (rand1.nextDouble() * 10)));
+        effectHelpers.add(rand1 -> new GaussianBlur(rand1.nextDouble() * 3));
+        effectHelpers.add(rand1 -> new Reflection(rand1.nextDouble() * 5, rand1.nextDouble(), rand1.nextDouble(), rand1.nextDouble()));
+        effectHelpers.add(rand1 -> new SepiaTone(rand1.nextDouble()*15));
+        effectHelpers.add(rand1 -> new Shadow(BlurType.values()[(int) (rand1.nextDouble() * BlurType.values().length)], Color.color(rand1.nextDouble()* 0.8, rand1.nextDouble() * 0.8, rand1.nextDouble() * 0.8, rand1.nextDouble() * 0.25 + 0.75), rand1.nextDouble() * 2));
+        effectHelpers.add(rand1 -> new DropShadow(BlurType.values()[(int) (rand1.nextDouble() * BlurType.values().length)], Color.color(rand1.nextDouble() * 0.8, rand1.nextDouble() * 0.8, rand1.nextDouble()* 0.8, rand1.nextDouble()*0.5), rand1.nextDouble() * 3,rand1.nextDouble() * 5, rand1.nextDouble() * 4 - 2, rand1.nextDouble() * 4 - 2));
         effectHelpers.add(rand1 -> new Lighting(new Light.Distant(rand1.nextDouble() * 100, rand1.nextDouble() * 50, Color.color(rand1.nextDouble(), rand1.nextDouble(), rand1.nextDouble(), rand1.nextDouble()))));
         effects = effectHelpers.toArray(new EffectHelper[effectHelpers.size()]);
     }
