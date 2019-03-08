@@ -36,13 +36,17 @@ public class JavaFXSampleGenerator extends SampleDataGenerator {
         System.gc();
     }
 
-    public Pair<WritableImage, String> getNextElement() {
-        String label = ((Character) getRandomCharacter()).toString();
+    public Pair<WritableImage, String> getNextElement(char c) {
+
+        String label = ((Character) c).toString();
         Text txt = new Text(label);
         txt.setFont(getRandomFont());
         distortText(txt);
         return new Pair<>(txt.snapshot(null, null), label);
+    }
 
+    public Pair<WritableImage, String> getNextElement() {
+        return getNextElement(getRandomCharacter());
     }
 
     public void distortText(Text txt) {
