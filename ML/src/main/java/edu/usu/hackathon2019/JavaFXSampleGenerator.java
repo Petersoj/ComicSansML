@@ -1,7 +1,6 @@
-package ML.SampleDate;
+package edu.usu.hackathon2019;
 
 import javafx.scene.effect.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
