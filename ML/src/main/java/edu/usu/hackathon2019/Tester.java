@@ -1,4 +1,4 @@
-package ML.SampleDate;
+package edu.usu.hackathon2019;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -53,7 +53,7 @@ public class Tester extends Application {
     }
 
     private void setImageViews() {
-        for (ImageView imv: imageViews) {
+        for (ImageView imv : imageViews) {
             imv.setImage(gen.getNextElement().getKey());
         }
     }
