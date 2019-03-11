@@ -11,8 +11,6 @@ public abstract class SampleDataGenerator implements Iterable {
 
     protected Random rand = new Random();
 
-    protected static char[] characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
-
     protected abstract void setup(int sampleCount);
 
     protected abstract void cleanup();
@@ -36,6 +34,6 @@ public abstract class SampleDataGenerator implements Iterable {
     }
 
     public char getRandomCharacter() {
-        return characters[(int) (characters.length * rand.nextDouble())];
+        return Config.characters[(int) (Config.characters.length * rand.nextDouble())];
     }
 }

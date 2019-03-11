@@ -1,12 +1,18 @@
 package ML.SampleDate;
 
+import javafx.geometry.Rectangle2D;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.effect.*;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.util.Pair;
+import javafx.scene.transform.Transform;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.primitives.Pair;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -15,6 +21,8 @@ public class JavaFXSampleGenerator extends SampleDataGenerator {
 
     protected static Font[] fonts;
     protected static EffectHelper[] effects;
+
+    private static SnapshotParameters snp = new SnapshotParameters();
 
     public void setup(int sampleCount) {
         rand = new Random();
@@ -42,7 +50,37 @@ public class JavaFXSampleGenerator extends SampleDataGenerator {
         Text txt = new Text(label);
         txt.setFont(getRandomFont());
         distortText(txt);
-        return new Pair<>(txt.snapshot(null, null), label);
+        return new Pair<>(txt.snapshot(snp, new WritableImage(Config.imageWidth, Config.imageHeight)), label);
+    }
+
+    public Pair<INDArray, INDArray> getNextSample(char character) {
+        Pair<WritableImage, String> sample = getNextElement(character);
+
+        WritableImage image = sample.getKey();
+        PixelReader pr = image.getPixelReader();
+
+        int height = (int) image.getHeight();
+        int width = (int) image.getWidth();
+        double[][][][] doubleImage = new double[Config.batchSize][Config.channels][height][width];
+        for (int b = 0; b < Config.batchSize; b++) {
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    Color c = pr.getColor(x, y);
+//                    doubleImage[b][x][y] = new double[]{c.getRed(), c.getGreen(), c.getBlue()};
+                    doubleImage[b][0][y][x] = c.getRed();
+                    doubleImage[b][1][y][x] = c.getGreen();
+                    doubleImage[b][2][y][x] = c.getBlue();
+                }
+            }
+        }
+
+        double[] label = new double[Config.characters.length];
+        label[Config.lookup.get(character)] = 1d;
+        return new Pair<>(Nd4j.create(doubleImage), Nd4j.create(label));
+    }
+
+    public Pair<INDArray, INDArray> getNextSample() {
+        return getNextSample(getRandomCharacter());
     }
 
     public Pair<WritableImage, String> getNextElement() {
