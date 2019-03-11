@@ -1,5 +1,5 @@
-import ML.SampleDate.Config;
-import ML.SampleDate.JavaFXSampleGenerator;
+import edu.usu.hackathon2019.Config;
+import edu.usu.hackathon2019.JavaFXSampleGenerator;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.deeplearning4j.datasets.iterator.INDArrayDataSetIterator;
@@ -23,7 +23,6 @@ import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.nd4j.linalg.primitives.Pair;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Launcher extends Application {
 

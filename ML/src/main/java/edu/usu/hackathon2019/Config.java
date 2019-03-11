@@ -1,4 +1,4 @@
-package ML.SampleDate;
+package edu.usu.hackathon2019;
 
 import java.util.HashMap;
 
