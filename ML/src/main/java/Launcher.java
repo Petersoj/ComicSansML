@@ -29,11 +29,10 @@ public class Launcher extends Application {
     public static MultiLayerConfiguration createConfig() {
         return new NeuralNetConfiguration.Builder()
                 .seed(Config.nueralNetworkSeed)
-                .l2(0.05)
+                .l2(0.0001)
                 .activation(Activation.RELU)
                 .weightInit(WeightInit.XAVIER)
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-                .updater(Updater.ADAM)
                 .list()
                     .layer(0, new ConvolutionLayer.Builder(new int[]{5, 5}, new int[]{1, 1}, new int[]{0, 0})
                             .name("CNN 1")
@@ -47,8 +46,8 @@ public class Launcher extends Application {
                     .layer(3, conv3x3("CNN 3", 64, 1))
                     .layer(4, maxPool("subsampling layer 2", new int[]{2,2}))
                     .layer(5, new DenseLayer.Builder()
-                            .activation(Activation.RRELU)
-                            .nOut(16)
+                            .activation(Activation.RELU)
+                            .nOut(512)
                             .dropOut(0.5)
                             .build()
                     )
@@ -57,8 +56,9 @@ public class Launcher extends Application {
                             .activation(Activation.SOFTMAX)
                             .build()
                     )
-                .backpropType(BackpropType.Standard)
+                .backprop(true)
                 .pretrain(false)
+                .backpropType(BackpropType.Standard)
                 .setInputType(InputType.convolutional(Config.imageHeight, Config.imageWidth, Config.channels))
                 .build();
     }
@@ -67,7 +67,7 @@ public class Launcher extends Application {
         ArrayList<Pair<INDArray, INDArray>> list = new ArrayList<>();
         JavaFXSampleGenerator sampleGenerator = new JavaFXSampleGenerator();
         sampleGenerator.setup(sampleCount);
-        for (int i = 0; i < sampleCount; i++) {
+        for (int i = 0; i < sampleCount * batchSize; i++) {
             list.add(sampleGenerator.getNextSample());
         }
         return new INDArrayDataSetIterator(list, batchSize);
@@ -80,10 +80,10 @@ public class Launcher extends Application {
         network.setListeners(new TimeIterationListener(1));
 
         System.out.println("Generating training data");
-        INDArrayDataSetIterator trainData = getSamples(200, Config.batchSize);
+        INDArrayDataSetIterator trainData = getSamples(20, Config.batchSize);
 
         System.out.println("Generating test data");
-        INDArrayDataSetIterator testData = getSamples(400, Config.batchSize);
+        INDArrayDataSetIterator testData = getSamples(20, Config.batchSize);
 
         System.out.println("Training the network");
         network.fit(trainData, Config.epochs);
@@ -91,10 +91,11 @@ public class Launcher extends Application {
         System.out.println("Evaluating network");
         Evaluation eval = network.evaluate(testData);
         System.out.println(eval.stats(false, true));
+        System.exit(0);
     }
 
     private static ConvolutionLayer conv3x3(String name, int out, double bias) {
-        return new ConvolutionLayer.Builder(new int[]{3,3}, new int[] {1,1}, new int[] {0,0}).activation(Activation.RRELU).name(name).nOut(out).biasInit(bias).build();
+        return new ConvolutionLayer.Builder(new int[]{3,3}, new int[] {1,1}, new int[] {0,0}).activation(Activation.RELU).name(name).nOut(out).biasInit(bias).build();
     }
 
 

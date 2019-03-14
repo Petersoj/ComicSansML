@@ -63,7 +63,6 @@ public class JavaFXSampleGenerator extends SampleDataGenerator {
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
                     Color c = pr.getColor(x, y);
-//                    doubleImage[b][x][y] = new double[]{c.getRed(), c.getGreen(), c.getBlue()};
                     doubleImage[b][0][y][x] = c.getRed();
                     doubleImage[b][1][y][x] = c.getGreen();
                     doubleImage[b][2][y][x] = c.getBlue();
