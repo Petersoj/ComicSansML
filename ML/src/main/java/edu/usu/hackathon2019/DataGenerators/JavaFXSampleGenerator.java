@@ -1,5 +1,6 @@
-package edu.usu.hackathon2019;
+package edu.usu.hackathon2019.DataGenerators;
 
+import edu.usu.hackathon2019.charclassifier.CharacterClassifierConfig;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.effect.*;
 import javafx.scene.image.PixelReader;
@@ -31,12 +32,12 @@ public class JavaFXSampleGenerator extends SampleDataGenerator {
     }
 
     @Override
-    protected void cleanup() {
+    public void cleanup() {
 
     }
 
     @Override
-    protected void destroy() {
+    public void destroy() {
         fonts = null;
         System.gc();
     }
@@ -47,7 +48,7 @@ public class JavaFXSampleGenerator extends SampleDataGenerator {
         Text txt = new Text(label);
         txt.setFont(getRandomFont());
         distortText(txt);
-        return new Pair<>(txt.snapshot(snp, new WritableImage(Config.imageWidth, Config.imageHeight)), label);
+        return new Pair<>(txt.snapshot(snp, new WritableImage(CharacterClassifierConfig.imageWidth, CharacterClassifierConfig.imageHeight)), label);
     }
 
     public Pair<INDArray, INDArray> getNextSample(char character) {
@@ -58,8 +59,8 @@ public class JavaFXSampleGenerator extends SampleDataGenerator {
 
         int height = (int) image.getHeight();
         int width = (int) image.getWidth();
-        double[][][][] doubleImage = new double[Config.batchSize][Config.channels][height][width];
-        for (int b = 0; b < Config.batchSize; b++) {
+        double[][][][] doubleImage = new double[CharacterClassifierConfig.batchSize][CharacterClassifierConfig.channels][height][width];
+        for (int b = 0; b < CharacterClassifierConfig.batchSize; b++) {
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
                     Color c = pr.getColor(x, y);
@@ -70,8 +71,8 @@ public class JavaFXSampleGenerator extends SampleDataGenerator {
             }
         }
 
-        double[] label = new double[Config.characters.length];
-        label[Config.lookup.get(character)] = 1d;
+        double[] label = new double[CharacterClassifierConfig.characters.length];
+        label[CharacterClassifierConfig.lookup.get(character)] = 1d;
         return new Pair<>(Nd4j.create(doubleImage), Nd4j.create(label));
     }
 

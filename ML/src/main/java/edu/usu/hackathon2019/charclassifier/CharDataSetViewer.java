@@ -1,45 +1,71 @@
 package edu.usu.hackathon2019.charclassifier;
 
+import edu.usu.hackathon2019.DataGenerators.JavaFXSampleGenerator;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
-public class CharDataSetViewer {
+public class CharDataSetViewer extends Application {
 
-    private JFrame frame;
-    private JPanel panel;
+    ImageView[] imageViews;
+    JavaFXSampleGenerator gen = new JavaFXSampleGenerator();
 
-    private CharDataSet charDataSet;
+    final int width = 10;
+    final int height = 10;
 
-    public CharDataSetViewer() {
-        this.createComponents();
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        Pane p = new Pane();
+        gen.setup(1000);
+        imageViews = new ImageView[width * height];
+        GridPane images = new GridPane();
+
+        for (int i = 0; i < imageViews.length; i++) {
+            imageViews[i] = new ImageView();
+            images.add(imageViews[i], i % width, i / height);
+        }
+
+        setImageViews();
+
+        p.getChildren().add(images);
+
+        Button btn = new Button("next");
+        btn.setOnMouseClicked((event -> {
+            setImageViews();
+        }));
+
+        p.getChildren().add(btn);
+
+        Scene scene = new Scene(p, 1000, 800);
+
+        btn.layoutXProperty().bind(scene.widthProperty().subtract(btn.widthProperty()).divide(2));
+        btn.layoutYProperty().bind(scene.heightProperty().subtract(btn.heightProperty()).subtract(2));
+
+        images.layoutXProperty().bind(scene.widthProperty().subtract(images.widthProperty()).divide(2));
+        images.layoutYProperty().bind(scene.heightProperty().subtract(images.heightProperty()).divide(2));
+
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("test");
+        primaryStage.show();
     }
 
-    private void createComponents() {
-        this.frame = new JFrame();
-        this.panel = new JPanel() {
-            @Override
-            public void paint(Graphics g) {
-                super.paint(g);
-
-                Graphics2D graphics = (Graphics2D) g;
-                if (charDataSet == null) {
-                    return;
-                }
-
-                // Draw here
-            }
-        };
-
-        this.frame.setContentPane(panel);
-        this.frame.setSize(CharDataSet.CHAR_RASTER_WIDTH,
-                CharDataSet.CHAR_RASTER_HEIGHT + frame.getInsets().top);
-        this.frame.setLocationRelativeTo(null);
+    private void setImageViews() {
+        for (ImageView imv : imageViews) {
+            imv.setImage(gen.getNextElement().getKey());
+        }
     }
 
-    public void show() {
-        this.frame.setVisible(true);
+    public static void main(String[] args) {
+        launch();
     }
 
 }
