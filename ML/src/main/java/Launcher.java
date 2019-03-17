@@ -7,6 +7,7 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.optimize.listeners.TimeIterationListener;
 import org.nd4j.evaluation.classification.Evaluation;
 
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 public class Launcher extends Application {
@@ -39,7 +40,7 @@ public class Launcher extends Application {
 //        System.out.println("Evaluating network");
 
         CharClassifierNetwork network = new CharClassifierNetwork();
-        if (!network.load("CharacterIdentifier.network")) {
+        if (!network.load("target/classes/models/CharacterIdentifier.network")) {
             long start = System.currentTimeMillis();
             System.out.println("training network");
             network.fit(2080, CharacterClassifierConfig.batchSize, CharacterClassifierConfig.epochs);
@@ -49,7 +50,7 @@ public class Launcher extends Application {
             network.save("CharacterIdentifier.network");
         }
         System.out.println("Evaluating network");
-        Evaluation eval = network.evaluate(10000, CharacterClassifierConfig.batchSize);
+        Evaluation eval = network.evaluate(40000, CharacterClassifierConfig.batchSize);
         System.out.println(eval.stats(false, true));
         System.exit(0);
     }
