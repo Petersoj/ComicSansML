@@ -13,8 +13,8 @@ import java.awt.image.BufferedImage;
 
 public class StringRasterDataSet extends DataSet {
 
-    public static final int STRING_RASTER_WIDTH = 256;
-    public static final int STRING_RASTER_HEIGHT = 64;
+    public static final int STRING_RASTER_WIDTH = 512;
+    public static final int STRING_RASTER_HEIGHT = 128;
 
     private String string;
     private Font font;

@@ -9,11 +9,11 @@ import java.io.File;
 public class CharIndexingNN {
 
     public static void main(String[] args) {
-        File networkSaveFile = null;
-        CharIndexingNN charIndexingNN = new CharIndexingNN(networkSaveFile);
+//        File networkSaveFile = null;
+//        CharIndexingNN charIndexingNN = new CharIndexingNN(networkSaveFile);
 
-        StringRasterDataSet stringRasterDataSet = new StringRasterDataSet("Ostensibly",
-                new Font("Brush Script MT", Font.ITALIC, 64));
+        StringRasterDataSet stringRasterDataSet = new StringRasterDataSet("A",
+                new Font("Rockness", Font.PLAIN, 500));
         stringRasterDataSet.createGlyphsOutlineRaster();
 
         CharIndexingViewer charIndexingViewer = new CharIndexingViewer();
