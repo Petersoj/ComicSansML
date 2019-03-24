@@ -7,7 +7,7 @@ public class CharacterClassifierConfig {
     public static final int imageWidth = 35;
     public static final int imageHeight = 25;
 
-    public static final char[] characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
+    public static final char[] characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890".toCharArray();
 
     public static final HashMap<Character, Integer> lookup = setup();
 

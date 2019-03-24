@@ -1,6 +1,7 @@
 package edu.usu.hackathon2019.DataGenerators;
 
-import edu.usu.hackathon2019.charclassifier.CharacterClassifierConfig;
+import edu.usu.hackathon2019.fontclassifier.FontClassifierConfig;
+import edu.usu.hackathon2019.fontclassifier.FontManager;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.effect.*;
 import javafx.scene.image.PixelReader;
@@ -13,9 +14,10 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.primitives.Pair;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
-public class JavaFXSampleGenerator extends SampleDataGenerator {
+public class JavaFXSampleFontGenerator extends JavaFXSampleGenerator {
 
     protected static Font[] fonts;
     protected static EffectHelper[] effects;
@@ -43,24 +45,33 @@ public class JavaFXSampleGenerator extends SampleDataGenerator {
     }
 
     public Pair<WritableImage, String> getNextElement(char c) {
+        String[] fonts = FontManager.getFonts();
+        return getNextElement(c, fonts[(int) (Math.random() * fonts.length)]);
+    }
 
-        String label = ((Character) c).toString();
-        Text txt = new Text(label);
-        txt.setFont(getRandomFont());
+    public Pair<WritableImage, String> getNextElement(char c, String fontFamily) {
+        String label = fontFamily;
+        Text txt = new Text(((Character) c).toString());
+        txt.setFont(Font.font(fontFamily));
         distortText(txt);
-        return new Pair<>(txt.snapshot(snp, new WritableImage(CharacterClassifierConfig.imageWidth, CharacterClassifierConfig.imageHeight)), label);
+        return new Pair<>(txt.snapshot(snp, new WritableImage(FontClassifierConfig.imageWidth, FontClassifierConfig.imageHeight)), label);
     }
 
     public Pair<INDArray, INDArray> getNextSample(char character) {
-        Pair<WritableImage, String> sample = getNextElement(character);
+        String[] fonts = FontManager.getFonts();
+        return getNextSample(character, fonts[ (int) (Math.random() * fonts.length)]);
+    }
+
+    public Pair<INDArray, INDArray> getNextSample(char character, String fontFamily) {
+        Pair<WritableImage, String> sample = getNextElement(character, fontFamily);
 
         WritableImage image = sample.getKey();
         PixelReader pr = image.getPixelReader();
 
         int height = (int) image.getHeight();
         int width = (int) image.getWidth();
-        double[][][][] doubleImage = new double[CharacterClassifierConfig.batchSize][CharacterClassifierConfig.channels][height][width];
-        for (int b = 0; b < CharacterClassifierConfig.batchSize; b++) {
+        double[][][][] doubleImage = new double[FontClassifierConfig.batchSize][FontClassifierConfig.channels][height][width];
+        for (int b = 0; b < FontClassifierConfig.batchSize; b++) {
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
                     Color c = pr.getColor(x, y);
@@ -71,8 +82,8 @@ public class JavaFXSampleGenerator extends SampleDataGenerator {
             }
         }
 
-        double[] label = new double[CharacterClassifierConfig.characters.length];
-        label[CharacterClassifierConfig.lookup.get(character)] = 1d;
+        double[] label = new double[FontManager.getFonts().length];
+        label[FontManager.getPosition(fontFamily)] = 1d;
         return new Pair<>(Nd4j.create(doubleImage), Nd4j.create(label));
     }
 
@@ -98,6 +109,30 @@ public class JavaFXSampleGenerator extends SampleDataGenerator {
 
     protected Font getRandomFont() {
         return fonts[(int) (fonts.length * rand.nextDouble())];
+    }
+
+    public ArrayList<Pair<INDArray, INDArray>> getSamples(char c, int samplesPerFont) {
+        ArrayList<Pair<INDArray, INDArray>> list = new ArrayList<>();
+        setup(samplesPerFont);
+        for (String font: FontManager.getFonts()) {
+            for (int i = 0; i < samplesPerFont; i++) {
+                list.add(getNextSample(c, font));
+            }
+        }
+        Collections.shuffle(list);
+        return list;
+    }
+
+    public ArrayList<Pair<INDArray, INDArray>> getSamples(int samplesPerFont) {
+        ArrayList<Pair<INDArray, INDArray>> list = new ArrayList<>();
+        setup(samplesPerFont);
+        for (String font: FontManager.getFonts()) {
+            for (int i = 0; i < samplesPerFont; i++) {
+                list.add(getNextSample(getRandomCharacter(), font));
+            }
+        }
+        Collections.shuffle(list);
+        return list;
     }
 
     private void generateEffects() {
