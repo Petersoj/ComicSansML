@@ -8,10 +8,16 @@ import java.awt.image.BufferedImage;
 
 public class CharDataSet {
 
+    // Don't change this order! The order corresponds with the output layer of the network!
+    public static final char[] CHARACTERS = ("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+            "abcdefghijklmnopqrstuvwxyz" +
+            "1234567890")
+            .toCharArray();
+
     private char character;
     private Font font;
-    private Shape shape;
     private BufferedImage raster;
+    private Shape shape;
 
     private INDArray features;
     private INDArray labels;
@@ -36,20 +42,20 @@ public class CharDataSet {
         this.font = font;
     }
 
-    public Shape getShape() {
-        return shape;
-    }
-
-    public void setShape(Shape shape) {
-        this.shape = shape;
-    }
-
     public BufferedImage getRaster() {
         return raster;
     }
 
     public void setRaster(BufferedImage raster) {
         this.raster = raster;
+    }
+
+    public Shape getShape() {
+        return shape;
+    }
+
+    public void setShape(Shape shape) {
+        this.shape = shape;
     }
 
     public INDArray getFeatures() {

@@ -29,6 +29,13 @@
             <artifactId>slf4j-simple</artifactId>
             <version>1.6.4</version>
         </dependency>
+        <dependency>
+            <!-- See src/main/resources/lib/libs_third_party_info.txt for more information about jar libs -->
+            <groupId>com.jhlabs</groupId>
+            <artifactId>Filters</artifactId>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/Filters.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <build>
