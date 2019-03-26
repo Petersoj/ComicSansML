@@ -73,7 +73,7 @@ public class FontClassifierNetwork {
         uiServer.attach(statsStorage);
 
         //Then add the StatsListener to collect this information from the network, as it trains
-        network.setListeners(new StatsListener(statsStorage, 36800));
+        network.setListeners(new StatsListener(statsStorage, 25000));
 //        network.setListeners(new EvaluativeListener(data, 1));
         network.fit(data, epochs);
     }

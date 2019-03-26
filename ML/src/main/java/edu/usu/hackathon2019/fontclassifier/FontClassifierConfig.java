@@ -12,8 +12,8 @@ public class FontClassifierConfig {
 
 
     public static final int batchSize = 1;
-    public static final int epochs = 200;
+    public static final int epochs = 63;
     public static final double l2 = 0.000009; //0.00001
-    public static final double learningRate = 0.000000009; //0.000005;
+    public static double learningRate = 0.00009; //0.000005;
 
 }

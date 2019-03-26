@@ -61,13 +61,16 @@ public class Launcher extends Application {
 //        gen.getNextElement();
 //        System.exit(0);
         FontManager.init();
-        FontClassifierNetwork network = new FontClassifierNetwork();
+        long start = System.currentTimeMillis();
+        FontClassifierNetwork network;
+        network = new FontClassifierNetwork();
+        System.out.println("training network");
         if (!network.load("target/classes/models/fontIdentifierForChar_a_.network")) {
-            long start = System.currentTimeMillis();
-            System.out.println("training network");
             JavaFXSampleFontGenerator generator = new JavaFXSampleFontGenerator();
             generator.setup(10);
-            ArrayList<Pair<INDArray, INDArray>> samples = generator.getSamples('a', 11);
+            ArrayList<Pair<INDArray, INDArray>> samples = generator.getSamples('a', 15);
+//        double accuracy = 0;
+//        while (true) {
             network.fit(samples, FontClassifierConfig.batchSize, FontClassifierConfig.epochs);
 
 
@@ -79,17 +82,25 @@ public class Launcher extends Application {
             network.save("fontIdentifierForChar_a_.network");
             System.out.println("Evaluating network with training data");
             Evaluation eval = network.evaluate(samples, FontClassifierConfig.batchSize);
+            System.out.println("learning rate: " + FontClassifierConfig.learningRate + " got accuracy of: " + eval.accuracy());
+
             System.out.println(eval.stats(false, true));
+//            if (eval.accuracy() > accuracy) {
+//                FontClassifierConfig.learningRate /= 7;
+//            } else {
+//                FontClassifierConfig.learningRate /= 0.7;
+//            }
+//        }
         }
         System.out.println("Evaluating network with new data");
         Evaluation eval = network.evaluate(40, FontClassifierConfig.batchSize, 'a');
         System.out.println(eval.stats(false, true));
         System.exit(0);
 //        System.exit(0);
-//        System.out.println("Evaluating network");
-//        Evaluation eval = network.evaluate(40000, CharacterClassifierConfig.batchSize);
-//        System.out.println(eval.stats(false, true));
-//        System.exit(0);
+////        System.out.println("Evaluating network");
+////        Evaluation eval = network.evaluate(40000, CharacterClassifierConfig.batchSize);
+////        System.out.println(eval.stats(false, true));
+////        System.exit(0);
     }
 
     public static void main(String[] args) {

@@ -53,6 +53,7 @@ public class JavaFXSampleFontGenerator extends JavaFXSampleGenerator {
         String label = fontFamily;
         Text txt = new Text(((Character) c).toString());
         txt.setFont(Font.font(fontFamily));
+        txt.setRotate(Math.random() * 20 - 10);
         distortText(txt);
         return new Pair<>(txt.snapshot(snp, new WritableImage(FontClassifierConfig.imageWidth, FontClassifierConfig.imageHeight)), label);
     }
