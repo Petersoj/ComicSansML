@@ -14,12 +14,16 @@ public class CharDataSetGenerator {
     private char[] chars;
     private ThreadLocalRandom random;
     private ArrayList<Font> fonts;
+    private int fontSizeMin;
+    private int fontSizeMax;
     private CharRasterGenerator charRasterGenerator;
 
     public CharDataSetGenerator() {
         this.chars = CharDataSet.CHARACTERS;
         this.random = ThreadLocalRandom.current();
         this.fonts = new ArrayList<>();
+        this.fontSizeMin = 30;
+        this.fontSizeMax = 60;
         this.charRasterGenerator = new CharRasterGenerator(this);
     }
 
@@ -50,11 +54,14 @@ public class CharDataSetGenerator {
     public CharDataSet generate() {
         char character = chars[random.nextInt(chars.length)];
         Font charFont = fonts.get(random.nextInt(fonts.size()));
-        BufferedImage charRaster = charRasterGenerator.generate();
+        Font derivedFont = charFont.deriveFont((float) random.nextDouble(fontSizeMin, fontSizeMax));
 
         CharDataSet charDataSet = new CharDataSet(character);
-        charDataSet.setFont(charFont);
+        charDataSet.setFont(derivedFont);
+
+        BufferedImage charRaster = charRasterGenerator.generate(charDataSet);
         charDataSet.setRaster(charRaster);
+
         return charDataSet;
     }
 
@@ -80,6 +87,22 @@ public class CharDataSetGenerator {
 
     public void setFonts(ArrayList<Font> fonts) {
         this.fonts = fonts;
+    }
+
+    public int getFontSizeMin() {
+        return fontSizeMin;
+    }
+
+    public void setFontSizeMin(int fontSizeMin) {
+        this.fontSizeMin = fontSizeMin;
+    }
+
+    public int getFontSizeMax() {
+        return fontSizeMax;
+    }
+
+    public void setFontSizeMax(int fontSizeMax) {
+        this.fontSizeMax = fontSizeMax;
     }
 
     public CharRasterGenerator getCharRasterGenerator() {
