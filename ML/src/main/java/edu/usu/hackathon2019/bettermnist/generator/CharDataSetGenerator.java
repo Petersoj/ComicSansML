@@ -32,7 +32,6 @@ public class CharDataSetGenerator {
     }
 
     private void loadFonts() throws IOException, FontFormatException {
-        // Handwritten fonts
         fonts.add(this.getNamedTrueTypeFont("handwritten", "ArchitectsDaughter.ttf"));
         fonts.add(this.getNamedTrueTypeFont("handwritten", "Estefin.ttf"));
         fonts.add(this.getNamedTrueTypeFont("handwritten", "Friday Vibes.ttf"));
@@ -51,20 +50,28 @@ public class CharDataSetGenerator {
         return Font.createFont(Font.TRUETYPE_FONT, this.getClass().getResourceAsStream(path));
     }
 
-    public CharDataSet generate() {
-        Font charFont = fonts.get(random.nextInt(fonts.size()));
-        Font derivedFont = charFont.deriveFont((float) random.nextDouble(fontSizeMin, fontSizeMax));
+    /**
+     * @param font      null for random font
+     * @param character null for random character
+     * @return the generated CharDataSet
+     */
+    public CharDataSet generate(Font font, Character character) {
+        if (font == null) {
+            Font charFont = fonts.get(random.nextInt(fonts.size()));
+            font = charFont.deriveFont((float) random.nextDouble(fontSizeMin, fontSizeMax));
+        }
 
-        Character character = null;
-        do {
-            char potentialChar = chars[random.nextInt(chars.length)];
-            if (derivedFont.canDisplay(potentialChar)) {
-                character = potentialChar;
-            }
-        } while (character == null);
+        if (character == null) {
+            do {
+                char potentialChar = chars[random.nextInt(chars.length)];
+                if (font.canDisplay(potentialChar)) {
+                    character = potentialChar;
+                }
+            } while (character == null);
+        }
 
         CharDataSet charDataSet = new CharDataSet(character);
-        charDataSet.setFont(derivedFont);
+        charDataSet.setFont(font);
 
         BufferedImage charRaster = charRasterGenerator.generate(charDataSet);
         charDataSet.setRaster(charRaster);
@@ -72,10 +79,24 @@ public class CharDataSetGenerator {
         return charDataSet;
     }
 
-    public CharDataSet[] generate(int number) {
-        CharDataSet[] charDataSets = new CharDataSet[number];
-        for (int i = 0; i < number; i++) {
-            charDataSets[i] = generate();
+    /**
+     * @param size           number of generated samples
+     * @param varyFonts      whether to use the same random font across all generated samples
+     * @param varyCharacters whether to use the same random character across all generated samples
+     * @return
+     */
+    public CharDataSet[] generate(int size, boolean varyFonts, boolean varyCharacters) {
+        if (size < 1) {
+            return null;
+        }
+        CharDataSet[] charDataSets = new CharDataSet[size];
+
+        CharDataSet firstCharDataSet = this.generate(null, null);
+        charDataSets[0] = firstCharDataSet;
+
+        for (int i = 1; i < size; i++) {
+            charDataSets[i] = generate(varyFonts ? null : firstCharDataSet.getFont(), varyCharacters ? null :
+                    firstCharDataSet.getCharacter());
         }
         return charDataSets;
     }

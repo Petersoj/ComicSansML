@@ -41,7 +41,7 @@ public class CharRunner {
         CharDataSetGenerator charDataSetGenerator = new CharDataSetGenerator();
         charDataSetGenerator.init();
 
-        CharDataSet[] charDataSets = charDataSetGenerator.generate(40);
+        CharDataSet[] charDataSets = charDataSetGenerator.generate(40, true, true);
         int i = 0;
         for (CharDataSet charDataSet : charDataSets) {
             System.out.println(charDataSet.getCharacter());
