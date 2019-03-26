@@ -22,7 +22,7 @@ public class CharDataSetGenerator {
         this.chars = CharDataSet.CHARACTERS;
         this.random = ThreadLocalRandom.current();
         this.fonts = new ArrayList<>();
-        this.fontSizeMin = 30;
+        this.fontSizeMin = 10;
         this.fontSizeMax = 60;
         this.charRasterGenerator = new CharRasterGenerator(this);
     }
@@ -52,9 +52,16 @@ public class CharDataSetGenerator {
     }
 
     public CharDataSet generate() {
-        char character = chars[random.nextInt(chars.length)];
         Font charFont = fonts.get(random.nextInt(fonts.size()));
         Font derivedFont = charFont.deriveFont((float) random.nextDouble(fontSizeMin, fontSizeMax));
+
+        Character character = null;
+        do {
+            char potentialChar = chars[random.nextInt(chars.length)];
+            if (derivedFont.canDisplay(potentialChar)) {
+                character = potentialChar;
+            }
+        } while (character == null);
 
         CharDataSet charDataSet = new CharDataSet(character);
         charDataSet.setFont(derivedFont);

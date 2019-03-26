@@ -10,6 +10,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <exec.mainClass>edu.usu.hackathon2019.bettermnist.CharRunner</exec.mainClass>
     </properties>
 
     <repositories>
