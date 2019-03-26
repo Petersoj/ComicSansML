@@ -1,0 +1,4 @@
+Filters.jar (http://www.jhlabs.com/ip/filters/index.html) - A very useful Library that allows raster manipulations using
+various filters. JHLabs doesn't have a maven repo for this library so it has to be installed manually to a local maven repo.
+
+See https://stackoverflow.com/a/36602256 for info on how to do this.

@@ -20,7 +20,7 @@ public class CharRasterViewer {
     private CharDataSet charDataSet;
 
     public CharRasterViewer() {
-
+        
     }
 
     public void show() {
