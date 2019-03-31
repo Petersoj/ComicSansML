@@ -13,21 +13,30 @@ import org.json.JSONObject;
 import javax.imageio.ImageIO;
 
 public class NetworkManager {
-    private static final NetworkManager manager = new NetworkManager();
+    public static final NetworkManager manager = new NetworkManager();
     private final HashMap<Character, FontClassifierNetwork> networks = new HashMap<>();
 
     private NetworkManager() {
+        init();
     }
 
     private void init() {
         for (char c: NetworkManagerConfig.availableChars) {
             FontClassifierNetwork net = new FontClassifierNetwork();
-            net.load("Models/" + c + ".network");
+            String characterPath = ((Character) c).toString();
+            if (!characterPath.toUpperCase().equals(characterPath)) {
+                characterPath = "_" + characterPath;
+            }
+            System.out.println(net.load("target/classes/models/" + characterPath + ".network"));
             networks.put(c, net);
         }
     }
 
-    public JSONObject getFont(ByteArrayOutputStream stream) {
-        Image img = ImageIO.read(new ByteArrayInputStream(stream));
+    public String interpret() {
+        return "interpreted";
     }
+
+//    public JSONObject getFont(ByteArrayOutputStream stream) {
+//        Image img = ImageIO.read(new ByteArrayInputStream(stream));
+//    }
 }
