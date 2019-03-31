@@ -7,8 +7,15 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+
+import org.deeplearning4j.datasets.iterator.INDArrayDataSetIterator;
 import org.json.JSONObject;
+import org.nd4j.evaluation.classification.Evaluation;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import org.nd4j.linalg.primitives.Pair;
 
 import javax.imageio.ImageIO;
 
@@ -32,8 +39,8 @@ public class NetworkManager {
         }
     }
 
-    public String interpret() {
-        return "interpreted";
+    public INDArray interpret(INDArray data) {
+        return networks.get('8').output(data);
     }
 
 //    public JSONObject getFont(ByteArrayOutputStream stream) {

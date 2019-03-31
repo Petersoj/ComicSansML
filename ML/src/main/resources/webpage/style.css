@@ -1,0 +1,15 @@
+*{
+    margin: 0;padding: 0;
+}
+
+body{
+/*    background-image: url(image/backdrop.jpeg);*/
+    background-size: cover;
+    background-color: black;
+}
+
+#particles-js{
+    background-size: cover;
+    background-color: black;
+    height: 1000px;
+}
