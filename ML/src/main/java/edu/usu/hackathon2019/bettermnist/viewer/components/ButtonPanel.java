@@ -2,6 +2,7 @@ package edu.usu.hackathon2019.bettermnist.viewer.components;
 
 import edu.usu.hackathon2019.bettermnist.CharDataSet;
 import edu.usu.hackathon2019.bettermnist.generator.CharDataSetGenerator;
+import edu.usu.hackathon2019.bettermnist.network.CharClassifierNetwork;
 import edu.usu.hackathon2019.bettermnist.viewer.CharRasterViewer;
 
 import javax.imageio.ImageIO;
@@ -21,6 +22,8 @@ import java.io.File;
 public class ButtonPanel extends JPanel implements ActionListener {
 
     private CharRasterViewer charRasterViewer;
+    private CharDataSetGenerator charDataSetGenerator;
+    private CharClassifierNetwork charClassifierNetwork;
 
     private SpringLayout springLayout;
     private JButton generateButton;
@@ -30,6 +33,8 @@ public class ButtonPanel extends JPanel implements ActionListener {
 
     public ButtonPanel(CharRasterViewer charRasterViewer) {
         this.charRasterViewer = charRasterViewer;
+        this.charDataSetGenerator = charRasterViewer.getCharRunner().getCharDataSetGenerator();
+        this.charClassifierNetwork = charRasterViewer.getCharRunner().getCharClassifierNetwork();
         this.springLayout = new SpringLayout();
     }
 
@@ -80,14 +85,12 @@ public class ButtonPanel extends JPanel implements ActionListener {
 
     // TEMP FOR DEBUGGING
     private CharDataSet tempCharDataSet;
-    private boolean varyFonts = false;
-    private boolean varyCharacters = false;
+    private boolean varyFonts = true;
+    private boolean varyCharacters = true;
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == generateButton) {
-            CharDataSetGenerator charDataSetGenerator = charRasterViewer.getCharRunner().getCharDataSetGenerator();
-
             if (tempCharDataSet == null) {
                 tempCharDataSet = charDataSetGenerator.generate(null, null);
             } else {
@@ -95,13 +98,21 @@ public class ButtonPanel extends JPanel implements ActionListener {
                         varyCharacters ? null : tempCharDataSet.getCharacter());
             }
 
-            // TODO feed CharDataSet to NN
+            CharDataSet predictedCharDataSet;
+            if (charClassifierNetwork.doesExist()) {
+                predictedCharDataSet = charClassifierNetwork.predict(tempCharDataSet);
+                tempCharDataSet.setLabels(predictedCharDataSet.getLabels());
+            } else {
+                predictedCharDataSet = tempCharDataSet;
+            }
 
             String formattedMessage = String.format(generateMessage, tempCharDataSet.getCharacter(),
-                    /*TODO put predicted char here*/ 'A', /*TODO say YES if match, NO if not*/ "YES");
+                    predictedCharDataSet.getCharacter(),
+                    tempCharDataSet.getCharacter() == predictedCharDataSet.getCharacter() ? "YES" : "NO");
             charRasterViewer.getInfoTextPane().setText(formattedMessage);
             charRasterViewer.setCharDataSet(tempCharDataSet);
             SwingUtilities.invokeLater(() -> charRasterViewer.getFrame().repaint());
+
         } else if (e.getSource() == chooseImageButton) {
             JFileChooser jFileChooser = new JFileChooser(System.getProperty("user.home"));
             jFileChooser.setDialogType(JFileChooser.OPEN_DIALOG);

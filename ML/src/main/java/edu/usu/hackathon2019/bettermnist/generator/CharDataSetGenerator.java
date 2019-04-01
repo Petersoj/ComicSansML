@@ -32,9 +32,10 @@ public class CharDataSetGenerator {
     }
 
     private void loadFonts() throws IOException, FontFormatException {
+        fonts.add(this.getNamedTrueTypeFont("handwritten", "alabama.ttf"));
         fonts.add(this.getNamedTrueTypeFont("handwritten", "ArchitectsDaughter.ttf"));
-        fonts.add(this.getNamedTrueTypeFont("handwritten", "Friday Vibes.ttf"));
-        fonts.add(this.getNamedTrueTypeFont("handwritten", "Gregor Miller\'s Friends.ttf"));
+//        fonts.add(this.getNamedTrueTypeFont("handwritten", "Friday Vibes.ttf"));
+//        fonts.add(this.getNamedTrueTypeFont("handwritten", "Gregor Miller\'s Friends.ttf"));
         fonts.add(this.getNamedTrueTypeFont("handwritten", "gunny_rewritten.ttf"));
         fonts.add(this.getNamedTrueTypeFont("handwritten", "HandwritingCR.ttf"));
         fonts.add(this.getNamedTrueTypeFont("handwritten", "Rockness.ttf"));
@@ -84,21 +85,21 @@ public class CharDataSetGenerator {
     }
 
     /**
-     * @param size           number of generated samples
+     * @param count          number of generated samples
      * @param varyFonts      whether to use the same random font across all generated samples
      * @param varyCharacters whether to use the same random character across all generated samples
      * @return
      */
-    public CharDataSet[] generate(int size, boolean varyFonts, boolean varyCharacters) {
-        if (size < 1) {
+    public CharDataSet[] generate(int count, boolean varyFonts, boolean varyCharacters) {
+        if (count < 1) {
             return null;
         }
-        CharDataSet[] charDataSets = new CharDataSet[size];
+        CharDataSet[] charDataSets = new CharDataSet[count];
 
         CharDataSet firstCharDataSet = this.generate(null, null);
         charDataSets[0] = firstCharDataSet;
 
-        for (int i = 1; i < size; i++) {
+        for (int i = 1; i < count; i++) {
             charDataSets[i] = generate(varyFonts ? null : firstCharDataSet.getFont(), varyCharacters ? null :
                     firstCharDataSet.getCharacter());
         }

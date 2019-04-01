@@ -20,7 +20,7 @@ public class VisualOutputPanel extends JPanel {
 
     public VisualOutputPanel(CharRasterViewer charRasterViewer) {
         this.charRasterViewer = charRasterViewer;
-        this.noProbabiltyBaseAlpha = 40;
+        this.noProbabiltyBaseAlpha = 30;
     }
 
     public void init() {

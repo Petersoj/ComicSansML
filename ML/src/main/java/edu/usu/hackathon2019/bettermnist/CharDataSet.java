@@ -7,6 +7,7 @@ import org.nd4j.linalg.factory.Nd4j;
 import java.awt.Font;
 import java.awt.Shape;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.util.Arrays;
 
 public class CharDataSet implements Comparable<CharDataSet> {
@@ -66,13 +67,16 @@ public class CharDataSet implements Comparable<CharDataSet> {
         if (raster.getType() != BufferedImage.TYPE_BYTE_GRAY) {
             throw new IllegalStateException("CharDataSet raster must be a grayscale!");
         }
-        int width = raster.getWidth();
-        int height = raster.getHeight();
+        int rows = raster.getHeight();
+        int cols = raster.getWidth();
 
-//        ByteArrayOutputStream pixelOutputStream = new ByteArrayOutputStream(width * height);
-//        ImageIO.write(raster, "JPG", pixelOutputStream);
-//        byte[] imageBytes = pixelOutputStream.toByteArray();
-        // TODO create features INDArray from BufferedImage
+        byte[] imageBytes = ((DataBufferByte) raster.getRaster().getDataBuffer()).getData();
+        double[][][][] imageDoubles = new double[1][1][rows][cols];
+
+        for (int i = 0; i < imageBytes.length; i++) {
+            imageDoubles[0][0][i % rows][i % cols] = ((imageBytes[i] & 0xFF) / 255d);
+        }
+        features = Nd4j.create(imageDoubles);
     }
 
     /**

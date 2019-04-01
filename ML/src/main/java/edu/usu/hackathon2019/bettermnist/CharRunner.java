@@ -1,9 +1,9 @@
 package edu.usu.hackathon2019.bettermnist;
 
 import edu.usu.hackathon2019.bettermnist.generator.CharDataSetGenerator;
+import edu.usu.hackathon2019.bettermnist.network.CharClassifierNetwork;
 import edu.usu.hackathon2019.bettermnist.viewer.CharRasterViewer;
 
-import javax.imageio.ImageIO;
 import java.awt.FontFormatException;
 import java.io.File;
 import java.io.IOException;
@@ -35,33 +35,50 @@ public class CharRunner {
     }
 
     private CharDataSetGenerator charDataSetGenerator;
+    private CharClassifierNetwork charClassifierNetwork;
+    private File saveFile;
 
     public CharRunner() {
         this.charDataSetGenerator = new CharDataSetGenerator();
+        this.charClassifierNetwork = new CharClassifierNetwork(charDataSetGenerator);
+        this.saveFile = new File(System.getProperty("user.home"), ".BetterMNIST.network");
     }
 
     public void init() throws FontFormatException, IOException {
         charDataSetGenerator.init();
     }
 
-    public void trainNeuralNetwork() throws IOException {
-        CharDataSet[] charDataSets = charDataSetGenerator.generate(42, false, false);
-        int i = 0;
-        for (CharDataSet charDataSet : charDataSets) {
-            System.out.println(charDataSet.getCharacter());
-            System.out.println(charDataSet.getFont().getName());
-            ImageIO.write(charDataSet.getRaster(), "JPG", new File("/Users/jacob/Desktop/", "test-" + i++ +
-                    " - " + charDataSet.getCharacter() + ".jpg"));
+    public void trainNeuralNetwork() {
+        charClassifierNetwork.createNewNetwork();
+        charClassifierNetwork.train();
+        charClassifierNetwork.test();
+
+        if (!saveFile.exists()) {
+            charClassifierNetwork.saveNetwork(saveFile);
         }
+
+//        CharDataSet[] charDataSets = charDataSetGenerator.generate(42, false, false);
+//        int i = 0;
+//        for (CharDataSet charDataSet : charDataSets) {
+//            ImageIO.write(charDataSet.getRaster(), "JPG", new File("/Users/jacob/Desktop/", "test-" + i++ +
+//                    " - " + charDataSet.getCharacter() + ".jpg"));
+//        }
     }
 
     public void testNeuralNetwork() {
         CharRasterViewer charRasterViewer = new CharRasterViewer(this);
         charRasterViewer.init();
+
+        charClassifierNetwork.loadNetwork(saveFile);
+
         charRasterViewer.show();
     }
 
     public CharDataSetGenerator getCharDataSetGenerator() {
         return charDataSetGenerator;
+    }
+
+    public CharClassifierNetwork getCharClassifierNetwork() {
+        return charClassifierNetwork;
     }
 }
