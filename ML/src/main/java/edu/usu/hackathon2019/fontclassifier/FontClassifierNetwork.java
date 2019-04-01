@@ -45,7 +45,7 @@ public class FontClassifierNetwork {
     public FontClassifierNetwork() {
         network = new MultiLayerNetwork(createConfig());
         network.init();
-        network.setListeners(new ScoreIterationListener(1));
+//        network.setListeners(new ScoreIterationListener(1));
     }
 
     public void fit(int sampleSize, int batchSize, int epochs, char c) {
@@ -63,17 +63,16 @@ public class FontClassifierNetwork {
     }
 
     public void fit(INDArrayDataSetIterator data, int epochs) {
-        //Initialize the user interface backend
-        UIServer uiServer = UIServer.getInstance();
+//        UIServer uiServer = UIServer.getInstance();
 
         //Configure where the network information (gradients, score vs. time etc) is to be stored. Here: store in memory.
-        StatsStorage statsStorage = new InMemoryStatsStorage();
+//        StatsStorage statsStorage = new InMemoryStatsStorage();
 
         //Attach the StatsStorage instance to the UI: this allows the contents of the StatsStorage to be visualized
-        uiServer.attach(statsStorage);
+//        uiServer.attach(statsStorage);
 
         //Then add the StatsListener to collect this information from the network, as it trains
-        network.setListeners(new StatsListener(statsStorage, 25000));
+//        network.setListeners(new StatsListener(statsStorage, 25000));
 //        network.setListeners(new EvaluativeListener(data, 1));
         network.fit(data, epochs);
     }
