@@ -30,10 +30,11 @@ public class CharRasterGenerator {
         // Set defaults
         this.rasterWidth = 64;
         this.rasterHeight = 64;
-        this.scaleFactor = 0.7; // 70% scale to give some wiggle room for the warping/filters
+        this.scaleFactor = 0.6; // 60% scale to give some wiggle room for the warping/filters
     }
 
     public BufferedImage generate(CharDataSet charDataSet) {
+        // Use grayscale for all rasters
         BufferedImage charRaster = new BufferedImage(rasterWidth, rasterHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics = charRaster.createGraphics();
 
@@ -60,15 +61,14 @@ public class CharRasterGenerator {
     private void prepareAndRasterizeChar(Graphics2D graphics, CharDataSet charDataSet) {
         // Use GlyphVector to get high precision bounds of character raster
         GlyphVector glyphVector = charDataSet.getFont().createGlyphVector(
-                graphics.getFontRenderContext(),
-                new char[]{charDataSet.getCharacter()});
+                graphics.getFontRenderContext(), String.valueOf(charDataSet.getCharacter()));
         Shape charShape = glyphVector.getGlyphOutline(0); // This is very resource intensive!
         charDataSet.setShape(charShape);
 
         Rectangle2D visualBounds = charShape.getBounds2D();
 
         double scaleX = (double) rasterWidth / visualBounds.getWidth();
-        double scaleY = (double) rasterWidth / visualBounds.getHeight();
+        double scaleY = (double) rasterHeight / visualBounds.getHeight();
         if (scaleX < scaleY) {
             scaleY = scaleX;
         } else if (scaleY < scaleX) {
@@ -82,7 +82,19 @@ public class CharRasterGenerator {
 
     private BufferedImage applyFilters(BufferedImage bufferedImage) {
         // TODO Apply filters randomly
-        return applyPerspectiveFilter(bufferedImage);
+        BufferedImage perspectiveImage = applyPerspectiveFilter(bufferedImage);
+        return applyGrayscaleFilter(perspectiveImage);
+    }
+
+    private BufferedImage applyGrayscaleFilter(BufferedImage raster) {
+        BufferedImage grayScaleImage = new BufferedImage(raster.getWidth(), raster.getHeight(),
+                BufferedImage.TYPE_BYTE_GRAY);
+        Graphics2D graphics = grayScaleImage.createGraphics();
+        graphics.setBackground(Color.WHITE);
+        graphics.clearRect(0, 0, grayScaleImage.getWidth(), grayScaleImage.getHeight());
+        graphics.drawImage(raster, 0, 0, null);
+        graphics.dispose();
+        return grayScaleImage;
     }
 
     // http://www.jhlabs.com/ip/filters/PerspectiveFilter.html
@@ -92,6 +104,7 @@ public class CharRasterGenerator {
         double translateScaleX = (1 - scaleFactor) * rasterWidth;
         double translateScaleY = (1 - scaleFactor) * rasterHeight;
 
+        // The following points are only corners that would down scale/warp the image (shrink warping)
         Point2D topLeft = new Point2D.Double(random.nextDouble(translateScaleX),
                 random.nextDouble(translateScaleY));
         Point2D topRight = new Point2D.Double(-random.nextDouble(translateScaleX) + rasterWidth,
@@ -109,8 +122,6 @@ public class CharRasterGenerator {
         BufferedImage filteredImage = perspectiveFilter.filter(raster, null);
         BufferedImage filteredScaledImage = new BufferedImage(rasterWidth, rasterHeight, filteredImage.getType());
         Graphics2D scaledGraphics = filteredScaledImage.createGraphics();
-
-        System.out.println(filteredImage.getWidth());
 
         int dx1 = (rasterWidth - filteredImage.getWidth()) / 2;
         int dy1 = (rasterHeight - filteredImage.getHeight()) / 2;
@@ -148,5 +159,13 @@ public class CharRasterGenerator {
 
     public void setRasterHeight(int rasterHeight) {
         this.rasterHeight = rasterHeight;
+    }
+
+    public double getScaleFactor() {
+        return scaleFactor;
+    }
+
+    public void setScaleFactor(double scaleFactor) {
+        this.scaleFactor = scaleFactor;
     }
 }

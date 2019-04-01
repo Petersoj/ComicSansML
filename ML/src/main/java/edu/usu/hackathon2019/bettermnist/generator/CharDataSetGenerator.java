@@ -33,7 +33,6 @@ public class CharDataSetGenerator {
 
     private void loadFonts() throws IOException, FontFormatException {
         fonts.add(this.getNamedTrueTypeFont("handwritten", "ArchitectsDaughter.ttf"));
-        fonts.add(this.getNamedTrueTypeFont("handwritten", "Estefin.ttf"));
         fonts.add(this.getNamedTrueTypeFont("handwritten", "Friday Vibes.ttf"));
         fonts.add(this.getNamedTrueTypeFont("handwritten", "Gregor Miller\'s Friends.ttf"));
         fonts.add(this.getNamedTrueTypeFont("handwritten", "gunny_rewritten.ttf"));
@@ -41,6 +40,8 @@ public class CharDataSetGenerator {
         fonts.add(this.getNamedTrueTypeFont("handwritten", "Rockness.ttf"));
         fonts.add(this.getNamedTrueTypeFont("handwritten", "TingTong.ttf"));
         fonts.add(this.getNamedTrueTypeFont("handwritten", "WhiteAngelica.ttf"));
+        fonts.add(this.getNamedTrueTypeFont("handwritten", "luna_bar.ttf"));
+        fonts.add(this.getNamedTrueTypeFont("handwritten", "DianaWebber Script.ttf"));
 
         // TODO add lots of other types of fonts (look at possible styles at https://www.dafont.com/)
     }
@@ -75,6 +76,9 @@ public class CharDataSetGenerator {
 
         BufferedImage charRaster = charRasterGenerator.generate(charDataSet);
         charDataSet.setRaster(charRaster);
+
+        charDataSet.assignFeatures();
+        charDataSet.assignLabels();
 
         return charDataSet;
     }

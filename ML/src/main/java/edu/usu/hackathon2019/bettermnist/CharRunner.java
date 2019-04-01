@@ -1,6 +1,7 @@
 package edu.usu.hackathon2019.bettermnist;
 
 import edu.usu.hackathon2019.bettermnist.generator.CharDataSetGenerator;
+import edu.usu.hackathon2019.bettermnist.viewer.CharRasterViewer;
 
 import javax.imageio.ImageIO;
 import java.awt.FontFormatException;
@@ -25,37 +26,42 @@ public class CharRunner {
 
     public static void main(String[] args) {
         try {
-
             CharRunner charRunner = new CharRunner();
-            charRunner.generateCharDataSets();
-
+            charRunner.init();
+            charRunner.testNeuralNetwork();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    private CharDataSetGenerator charDataSetGenerator;
+
     public CharRunner() {
+        this.charDataSetGenerator = new CharDataSetGenerator();
     }
 
-    public void generateCharDataSets() throws IOException, FontFormatException {
-        CharDataSetGenerator charDataSetGenerator = new CharDataSetGenerator();
+    public void init() throws FontFormatException, IOException {
         charDataSetGenerator.init();
+    }
 
-        CharDataSet[] charDataSets = charDataSetGenerator.generate(40, true, true);
+    public void trainNeuralNetwork() throws IOException {
+        CharDataSet[] charDataSets = charDataSetGenerator.generate(42, false, false);
         int i = 0;
         for (CharDataSet charDataSet : charDataSets) {
             System.out.println(charDataSet.getCharacter());
             System.out.println(charDataSet.getFont().getName());
-            ImageIO.write(charDataSet.getRaster(), "PNG", new File("/Users/jacob/Desktop/", "test-" + i++ +
-                    " - " + charDataSet.getCharacter() + ".png"));
+            ImageIO.write(charDataSet.getRaster(), "JPG", new File("/Users/jacob/Desktop/", "test-" + i++ +
+                    " - " + charDataSet.getCharacter() + ".jpg"));
         }
     }
 
-    public void trainNeuralNetwork() {
-
+    public void testNeuralNetwork() {
+        CharRasterViewer charRasterViewer = new CharRasterViewer(this);
+        charRasterViewer.init();
+        charRasterViewer.show();
     }
 
-    public void testNeuralNetwork(boolean displayCharRasterViewer) {
-
+    public CharDataSetGenerator getCharDataSetGenerator() {
+        return charDataSetGenerator;
     }
 }
