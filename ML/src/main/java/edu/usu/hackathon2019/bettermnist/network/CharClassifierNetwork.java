@@ -16,6 +16,9 @@ import org.deeplearning4j.nn.conf.layers.SubsamplingLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
+import org.deeplearning4j.ui.api.UIServer;
+import org.deeplearning4j.ui.stats.StatsListener;
+import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
 import org.nd4j.evaluation.classification.Evaluation;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -82,10 +85,11 @@ public class CharClassifierNetwork {
 
         HashMap<Integer, Double> learningRateSchedule = new HashMap<>();
         learningRateSchedule.put(0, 0.06);
-        learningRateSchedule.put(200, 0.045);
-        learningRateSchedule.put(600, 0.03);
+//        learningRateSchedule.put(200, 0.045);
+//        learningRateSchedule.put(600, 0.03);
 //        learningRateSchedule.put(800, 0.006);
 //        learningRateSchedule.put(1500, 0.001);
+//        learningRateSchedule.put(5000, 0.0005);
         builder.updater(new Adam(new MapSchedule(ScheduleType.ITERATION, learningRateSchedule)));
 
         return builder;
@@ -114,7 +118,6 @@ public class CharClassifierNetwork {
                 .nOut(50)
                 .kernelSize(5, 5)
                 .stride(1, 1)
-                .activation(Activation.IDENTITY)
                 .build();
 
         SubsamplingLayer secondSubsamplingLayer = new SubsamplingLayer.Builder()
@@ -159,9 +162,9 @@ public class CharClassifierNetwork {
             throw new NullPointerException("Network must be loaded/created before training!");
         }
 
-        int epochs = 3;
+        int epochs = 10;
         int numberOfSamples = 10_000;
-        int batchSize = 5;
+        int batchSize = 50;
 
         logger.info("Generating " + numberOfSamples + " samples.");
         CharDataSet[] charDataSets = charDataSetGenerator.generate(numberOfSamples, true, true);
@@ -205,13 +208,13 @@ public class CharClassifierNetwork {
     }
 
     private void addTrainingListeners(int epochs, int numberOfSamples, int batchSize) {
-        network.addListeners(new ScoreIterationListener(1));
+        network.addListeners(new ScoreIterationListener(100));
 
         // UIServer Listener
-//        UIServer uiServer = UIServer.getInstance();
-//        InMemoryStatsStorage inMemoryStatsStorage = new InMemoryStatsStorage();
-//        uiServer.attach(inMemoryStatsStorage);
-//        network.addListeners(new StatsListener(inMemoryStatsStorage, 10));
+        UIServer uiServer = UIServer.getInstance();
+        InMemoryStatsStorage inMemoryStatsStorage = new InMemoryStatsStorage();
+        uiServer.attach(inMemoryStatsStorage);
+        network.addListeners(new StatsListener(inMemoryStatsStorage, 100));
     }
 
     public CharDataSet predict(CharDataSet charDataSet) {

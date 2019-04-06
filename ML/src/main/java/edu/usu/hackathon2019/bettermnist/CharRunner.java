@@ -28,7 +28,7 @@ public class CharRunner {
         try {
             CharRunner charRunner = new CharRunner();
             charRunner.init();
-            charRunner.testNeuralNetwork();
+            charRunner.trainNeuralNetwork();
         } catch (Exception e) {
             e.printStackTrace();
         }
