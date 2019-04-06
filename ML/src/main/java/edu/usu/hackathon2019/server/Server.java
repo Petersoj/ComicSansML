@@ -9,6 +9,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.RequestContext;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.nd4j.evaluation.classification.Evaluation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
@@ -34,37 +35,22 @@ public class Server {
 
     public static void main(String[] args) throws Exception {
         FontManager.init();
+        NetworkManager.manager.initialize();
         HttpServer server = HttpServer.create(new InetSocketAddress("localhost", ServerConfig.port), 0);
-        server.createContext("/test", new MyHandler());
+        server.createContext("/test", new testHandler());
         server.createContext("/interpret", new fileHandler());
         server.createContext("/webpage", new WebPageServer());
-        for(String font: FontManager.getFonts()) {
-            System.out.println(font);
-        }
         server.setExecutor(null); // creates a default executor
         server.start();
         System.out.println(server.getAddress().getHostString());
     }
 
-    static class MyHandler implements HttpHandler {
+    static class testHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange t) throws IOException {
-            String response = "<html><head><title>ComicSans ML</title></head><body><center><h1>Hello World</h1></center></body></html>";
+            String response = "<html><head><title>ComicSans ML</title></head><body><center><h1>The server is online</h1></center></body></html>";
             t.sendResponseHeaders(200, response.length());
             OutputStream os = t.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
-        }
-    }
-
-    static class NetWorkHandler implements HttpHandler {
-
-        @Override
-        public void handle(HttpExchange httpExchange) throws IOException {
-//            String response = NetworkManager.manager.interpret();
-            String response = "interpreting";
-            httpExchange.sendResponseHeaders(200, response.length());
-            OutputStream os = httpExchange.getResponseBody();
             os.write(response.getBytes());
             os.close();
         }
@@ -99,29 +85,38 @@ public class Server {
                 t.getResponseHeaders().add("Content-type", "text/plain");
                 t.sendResponseHeaders(200, 0);
                 OutputStream os = t.getResponseBody();
+                char character = 'a';
                 for(FileItem fi : result) {
-//                    os.write(fi.getName().getBytes());
-//                    IOUtils.copy(fi.getInputStream(), os);
-//                    os.write("\r\n".getBytes());
-                    BufferedImage image = toBufferedImage(ImageIO.read(fi.getInputStream()).getScaledInstance(FontClassifierConfig.imageWidth, FontClassifierConfig.imageHeight, 0));
-                    INDArray guess = NetworkManager.manager.interpret(getSample(image));
-                    JSONArray data = new JSONArray();
-                    double[] rec = guess.data().asDouble();
-                    String[] fonts = FontManager.getFonts();
-                    for (int i = 0; i < fonts.length; i++) {
-                        JSONObject element = new JSONObject();
-                        element.put("fontName", fonts[i]);
-                        element.put("probability", rec[i]);
-                        data.put(element);
+                        if (fi.getFieldName().equals("letter")) {
+                            if (fi.getString().length() == 0 || fi.getString().length() > 1 ){
+                                throw new RuntimeException("Bad request");
+                            } else {
+                                character = fi.getString().charAt(0);
+                            }
+                        }
+                }
+                for(FileItem fi : result) {
+                    if (fi.getContentType() != null && fi.getContentType().startsWith("image")) {
+                        BufferedImage image = toBufferedImage(ImageIO.read(fi.getInputStream()).getScaledInstance(FontClassifierConfig.imageWidth, FontClassifierConfig.imageHeight, Image.SCALE_DEFAULT));
+                        INDArray guess = NetworkManager.manager.interpret(getSample(image), character);
+                        JSONArray data = new JSONArray();
+                        double[] rec = guess.data().asDouble();
+                        String[] fonts = FontManager.getFonts();
+                        for (int i = 0; i < fonts.length; i++) {
+                            JSONObject element = new JSONObject();
+                            element.put("fontName", fonts[i]);
+                            element.put("probability", rec[i]);
+                            data.put(element);
+                        }
+                        String res = data.toString();
+                        os.write(res.getBytes());
                     }
-                    String res = data.toString();
-                    os.write(res.getBytes());
                 }
                 os.close();
 
             } catch (Exception e) {
                 e.printStackTrace();
-                t.sendResponseHeaders(401, 0);
+                t.sendResponseHeaders(400, 0);
                 t.getResponseBody().close();
             }
         }
@@ -135,7 +130,7 @@ public class Server {
         }
 
         // Create a buffered image with transparency
-        BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_RGB);
 
         // Draw the image on to the buffered image
         Graphics2D bGr = bimage.createGraphics();

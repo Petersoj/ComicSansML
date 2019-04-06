@@ -4,6 +4,7 @@ import edu.usu.hackathon2019.charclassifier.CharacterClassifierConfig;
 import edu.usu.hackathon2019.fontclassifier.FontClassifierConfig;
 import edu.usu.hackathon2019.fontclassifier.FontClassifierNetwork;
 import edu.usu.hackathon2019.fontclassifier.FontManager;
+import edu.usu.hackathon2019.server.NetworkManager;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.deeplearning4j.datasets.iterator.INDArrayDataSetIterator;
@@ -61,41 +62,44 @@ public class Launcher extends Application {
 //        gen.getNextElement();
 //        System.exit(0);
         FontManager.init();
-        long start = System.currentTimeMillis();
-        FontClassifierNetwork network;
-        network = new FontClassifierNetwork();
-        System.out.println("training network");
-        if (!network.load("target/classes/models/fontIdentifierForChar_a_.network")) {
-            JavaFXSampleFontGenerator generator = new JavaFXSampleFontGenerator();
-            generator.setup(10);
-            ArrayList<Pair<INDArray, INDArray>> samples = generator.getSamples('a', 15);
-//        double accuracy = 0;
-//        while (true) {
-            network.fit(samples, FontClassifierConfig.batchSize, FontClassifierConfig.epochs);
 
-
-            long elapse = System.currentTimeMillis() - start;
-            System.out.println("took:" + elapse + " ms");
-            System.out.println("Training time: " + TimeUnit.MILLISECONDS.toHours(elapse) + " Hours " + TimeUnit.MILLISECONDS.toMinutes(elapse) + " minutes");
-
-
-            network.save("fontIdentifierForChar_a_.network");
-            System.out.println("Evaluating network with training data");
-            Evaluation eval = network.evaluate(samples, FontClassifierConfig.batchSize);
-            System.out.println("learning rate: " + FontClassifierConfig.learningRate + " got accuracy of: " + eval.accuracy());
-
-            System.out.println(eval.stats(false, true));
-//            if (eval.accuracy() > accuracy) {
-//                FontClassifierConfig.learningRate /= 7;
-//            } else {
-//                FontClassifierConfig.learningRate /= 0.7;
-//            }
-//        }
-        }
-        System.out.println("Evaluating network with new data");
-        Evaluation eval = network.evaluate(40, FontClassifierConfig.batchSize, 'a');
+        Evaluation eval = NetworkManager.manager.eval('a', 40);
         System.out.println(eval.stats(false, true));
-        System.exit(0);
+//                    long start = System.currentTimeMillis();
+//                    FontClassifierNetwork network;
+//                    network = new FontClassifierNetwork();
+//                    System.out.println("training network");
+//                    if (!network.load("target/classes/models/fontIdentifierForChar_a_.network")) {
+//                        JavaFXSampleFontGenerator generator = new JavaFXSampleFontGenerator();
+//                        generator.setup(10);
+//                        ArrayList<Pair<INDArray, INDArray>> samples = generator.getSamples('a', 15);
+//            //        double accuracy = 0;
+//            //        while (true) {
+//                        network.fit(samples, FontClassifierConfig.batchSize, FontClassifierConfig.epochs);
+//
+//
+//                        long elapse = System.currentTimeMillis() - start;
+//                        System.out.println("took:" + elapse + " ms");
+//                        System.out.println("Training time: " + TimeUnit.MILLISECONDS.toHours(elapse) + " Hours " + TimeUnit.MILLISECONDS.toMinutes(elapse) + " minutes");
+//
+//
+//                        network.save("fontIdentifierForChar_a_.network");
+//                        System.out.println("Evaluating network with training data");
+//                        Evaluation eval = network.evaluate(samples, FontClassifierConfig.batchSize);
+//                        System.out.println("learning rate: " + FontClassifierConfig.learningRate + " got accuracy of: " + eval.accuracy());
+//
+//                        System.out.println(eval.stats(false, true));
+//            //            if (eval.accuracy() > accuracy) {
+//            //                FontClassifierConfig.learningRate /= 7;
+//            //            } else {
+//            //                FontClassifierConfig.learningRate /= 0.7;
+//            //            }
+//            //        }
+//                    }
+//                    System.out.println("Evaluating network with new data");
+//                    Evaluation eval = network.evaluate(40, FontClassifierConfig.batchSize, 'a');
+//                    System.out.println(eval.stats(false, true));
+//                    System.exit(0);
 //        System.exit(0);
 ////        System.out.println("Evaluating network");
 ////        Evaluation eval = network.evaluate(40000, CharacterClassifierConfig.batchSize);

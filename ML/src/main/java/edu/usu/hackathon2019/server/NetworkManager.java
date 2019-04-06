@@ -1,6 +1,7 @@
 package edu.usu.hackathon2019.server;
 
 import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
+import edu.usu.hackathon2019.fontclassifier.FontClassifierConfig;
 import edu.usu.hackathon2019.fontclassifier.FontClassifierNetwork;
 
 import java.awt.*;
@@ -39,8 +40,14 @@ public class NetworkManager {
         }
     }
 
-    public INDArray interpret(INDArray data) {
-        return networks.get('8').output(data);
+    public INDArray interpret(INDArray data, char character) {
+        return networks.get(character).output(data);
+    }
+
+    public void initialize() {}
+
+    public Evaluation eval(char character, int sampleSize) {
+        return networks.get(character).evaluate(sampleSize, FontClassifierConfig.batchSize, character);
     }
 
 //    public JSONObject getFont(ByteArrayOutputStream stream) {
