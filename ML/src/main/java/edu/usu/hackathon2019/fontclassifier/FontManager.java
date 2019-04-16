@@ -1,6 +1,7 @@
 package edu.usu.hackathon2019.fontclassifier;
 
 import javafx.scene.text.Font;
+import org.nd4j.evaluation.classification.Evaluation;
 
 import java.util.ArrayList;
 import java.util.HashMap;

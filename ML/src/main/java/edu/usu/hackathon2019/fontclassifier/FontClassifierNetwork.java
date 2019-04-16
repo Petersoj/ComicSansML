@@ -91,6 +91,10 @@ public class FontClassifierNetwork {
         return evaluate(new INDArrayDataSetIterator(data, batchSize));
     }
 
+    public INDArray output(INDArray input) {
+        return network.output(input);
+    }
+
     public Evaluation evaluate(DataSetIterator data) {
         return network.evaluate(data);
     }
