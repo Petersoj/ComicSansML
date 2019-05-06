@@ -23,16 +23,16 @@ public class Launcher extends Application {
     public static void start() {
 
         FontManager.init();
-        int sampleCountPerFont = 15;
-        int evaluationCountPerFont = 30;
+        int sampleCountPerFont = 25;
+        int evaluationCountPerFont = 40;
         int lastupdate = 0;
         double lastAccuracy;
-        double overfitAccuracy = 2.0d / FontManager.getFonts().length;
+        double overfitAccuracy = 1.0d / FontManager.getFonts().length;
         ArrayList<Pair<INDArray, INDArray>> evaluationSet;
         ArrayList<Pair<INDArray, INDArray>> trainingSet;
         FontClassifierNetwork network;
         String past_save = null;
-        for (char character: "tuvwxyz1234567890".toCharArray()) {
+        for (char character: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890".toCharArray()) {
             System.out.println("Starting to train model \"" + character + "\"");
             lastAccuracy = 0;
             lastupdate = 0;
@@ -41,11 +41,12 @@ public class Launcher extends Application {
             evaluationSet = generator.getSamples(character, evaluationCountPerFont);
             trainingSet = generator.getSamples(character, sampleCountPerFont);
             network = new FontClassifierNetwork();
-            for (int i = 0; i < 10; i++) {
-                network.fit(trainingSet, FontClassifierConfig.batchSize, 10);
+            for (int i = 0; i < 200; i++) {
+                network.fit(trainingSet, FontClassifierConfig.batchSize, 5);
                 Evaluation eval = network.evaluate(evaluationSet, FontClassifierConfig.batchSize);
                 System.out.println("Finished \"" + character + "\" batch: " + i + " with acc: " + eval.accuracy());
-                if (eval.accuracy() <= overfitAccuracy) {
+                System.out.println(eval.confusionMatrix());
+                if (eval.accuracy() == overfitAccuracy) {
                     System.out.println("breaking out of \"" + character + "\" due to overfitting");
                     break;
                 }

@@ -1,36 +1,40 @@
 package edu.usu.hackathon2019.fontclassifier;
 
 import edu.usu.hackathon2019.DataGenerators.JavaFXSampleFontGenerator;
-import org.deeplearning4j.api.storage.StatsStorage;
+//import org.deeplearning4j.api.storage.StatsStorage;
 import org.deeplearning4j.datasets.iterator.INDArrayDataSetIterator;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
+//import org.deeplearning4j.nn.api.layers.LayerConstraint;
 import org.deeplearning4j.nn.conf.BackpropType;
 import org.deeplearning4j.nn.conf.GradientNormalization;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
-import org.deeplearning4j.nn.conf.distribution.Distribution;
-import org.deeplearning4j.nn.conf.distribution.TruncatedNormalDistribution;
+//import org.deeplearning4j.nn.conf.constraint.MinMaxNormConstraint;
+import org.deeplearning4j.nn.conf.constraint.MinMaxNormConstraint;
+import org.deeplearning4j.nn.conf.constraint.NonNegativeConstraint;
+//import org.deeplearning4j.nn.conf.distribution.Distribution;
+//import org.deeplearning4j.nn.conf.distribution.TruncatedNormalDistribution;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
 import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.conf.layers.SubsamplingLayer;
-import org.deeplearning4j.nn.conf.weightnoise.WeightNoise;
+//import org.deeplearning4j.nn.conf.weightnoise.WeightNoise;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
-import org.deeplearning4j.optimize.listeners.EvaluativeListener;
-import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
-import org.deeplearning4j.ui.api.UIServer;
-import org.deeplearning4j.ui.stats.StatsListener;
-import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
+//import org.deeplearning4j.optimize.listeners.EvaluativeListener;
+//import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
+//import org.deeplearning4j.ui.api.UIServer;
+//import org.deeplearning4j.ui.stats.StatsListener;
+//import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
 import org.nd4j.evaluation.classification.Evaluation;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import org.nd4j.linalg.learning.NesterovsUpdater;
+//import org.nd4j.linalg.learning.NesterovsUpdater;
 import org.nd4j.linalg.learning.config.Adam;
-import org.nd4j.linalg.learning.config.IUpdater;
-import org.nd4j.linalg.learning.config.Nesterovs;
+//import org.nd4j.linalg.learning.config.IUpdater;
+//import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.nd4j.linalg.primitives.Pair;
 
@@ -65,13 +69,13 @@ public class FontClassifierNetwork {
     public void fit(INDArrayDataSetIterator data, int epochs) {
 //        UIServer uiServer = UIServer.getInstance();
 
-        //Configure where the network information (gradients, score vs. time etc) is to be stored. Here: store in memory.
+//        Configure where the network information (gradients, score vs. time etc) is to be stored. Here: store in memory.
 //        StatsStorage statsStorage = new InMemoryStatsStorage();
 
-        //Attach the StatsStorage instance to the UI: this allows the contents of the StatsStorage to be visualized
+//        Attach the StatsStorage instance to the UI: this allows the contents of the StatsStorage to be visualized
 //        uiServer.attach(statsStorage);
 
-        //Then add the StatsListener to collect this information from the network, as it trains
+//        Then add the StatsListener to collect this information from the network, as it trains
 //        network.setListeners(new StatsListener(statsStorage, 25000));
 //        network.setListeners(new EvaluativeListener(data, 1));
         network.fit(data, epochs);
@@ -127,7 +131,9 @@ public class FontClassifierNetwork {
                 .l2(FontClassifierConfig.l2)
                 .activation(Activation.RELU)
                 .weightInit(WeightInit.XAVIER)
-                .gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
+//                .gradientNormalization(GradientNormalization.ClipL2PerLayer)
+                .gradientNormalization(GradientNormalization.ClipL2PerParamType)
+
 //                .weightNoise(new WeightNoise(new TruncatedNormalDistribution(6 * FontClassifierConfig.l2, FontClassifierConfig.learningRate / 10), true))
 //                .updater(
 //                        new NesterovsUpdater(new Nesterovs(FontClassifierConfig.learningRate, 0.1)).getConfig())
@@ -137,21 +143,40 @@ public class FontClassifierNetwork {
                 .layer(0, new ConvolutionLayer.Builder(new int[]{5, 5}, new int[]{1, 1}, new int[]{0, 0})
                         .name("CNN 1")
                         .nIn(FontClassifierConfig.channels)
+                        .activation(Activation.RELU)
                         .nOut(32)
-                        .biasInit(0)
+                        .weightInit(WeightInit.XAVIER)
+                        .biasInit(0.1)
+                        .dropOut(0.5)
+//                        .constrainWeights(new MinMaxNormConstraint(0.01, 10, 3))
+                        .constrainAllParameters(new MinMaxNormConstraint(0.000000000000000005, Double.MAX_VALUE, 3))
+                        .constrainAllParameters(new NonNegativeConstraint())
                         .build()
                 )
                 .layer(1, maxPool("subsampling layer 1", new int[]{2,2}))
-                .layer(2, conv3x3("CNN 2", 64, 0))
-                .layer(3, conv3x3("CNN 3", 64, 1))
+                .layer(2, conv3x3("CNN 2", 128, 0.1))
+                .layer(3, conv3x3("CNN 3", 128, 0.9))
                 .layer(4, maxPool("subsampling layer 2", new int[]{2,2}))
                 .layer(5, new DenseLayer.Builder()
                         .activation(Activation.RELU)
+                        .weightInit(WeightInit.XAVIER)
+//                        .constrainAllParameters(new NonNegativeConstraint())
+                        .constrainAllParameters(new MinMaxNormConstraint(0.000000000000000005, Double.MAX_VALUE, 1))
                         .nOut(512)
-                        .dropOut(0.5)
+//                        .constrainWeights(new MinMaxNormConstraint(0.01, 10, 1))
                         .build()
                 )
-                .layer(6, new OutputLayer.Builder(LossFunctions.LossFunction.RECONSTRUCTION_CROSSENTROPY)
+                .layer(6, new DenseLayer.Builder()
+                                .activation(Activation.RELU)
+                                .weightInit(WeightInit.XAVIER)
+//                        .constrainAllParameters(new NonNegativeConstraint())
+                                .nOut(256)
+//                                .constrainAllParameters(new MinMaxNormConstraint(-Double.MAX_VALUE, -0.000000000000005, 1))
+                                .constrainAllParameters(new MinMaxNormConstraint(0.000000000000000005, Double.MAX_VALUE, 1))
+//                        .constrainWeights(new MinMaxNormConstraint(0.01, 10, 1))
+                                .build()
+                )
+                .layer(7, new OutputLayer.Builder(LossFunctions.LossFunction.RECONSTRUCTION_CROSSENTROPY)
                         .nOut(FontManager.getFonts().length)
                         .activation(Activation.SOFTMAX)
                         .build()
@@ -164,11 +189,19 @@ public class FontClassifierNetwork {
     }
 
     private static ConvolutionLayer conv3x3(String name, int out, double bias) {
-        return new ConvolutionLayer.Builder(new int[]{3,3}, new int[] {1,1}, new int[] {1,1}).activation(Activation.RELU).name(name).nOut(out).biasInit(bias).build();
+        return new ConvolutionLayer.Builder(new int[]{3,3}, new int[] {1,1}, new int[] {1,1}).activation(Activation.RELU)
+//                .constrainWeights(new MinMaxNormConstraint(0.01, 10, 3))
+//                .constrainAllParameters(new NonNegativeConstraint())
+//                .constrainAllParameters(new MinMaxNormConstraint(0.0000000005, Double.MAX_VALUE, 3))
+                .weightInit(WeightInit.XAVIER)
+                .name(name).nOut(out).biasInit(bias).build();
     }
 
 
     private static SubsamplingLayer maxPool(String name, int[] kernel) {
-        return new SubsamplingLayer.Builder(kernel, new int[]{2,2}).name(name).build();
+        return new SubsamplingLayer.Builder(kernel, new int[]{2,2})
+//                .constrainWeights(new MinMaxNormConstraint(0.01, 10, 3))
+//                .constrainAllParameters(new MinMaxNormConstraint(0.0000000005, Double.MAX_VALUE, 3))f
+                .name(name).build();
     }
 }

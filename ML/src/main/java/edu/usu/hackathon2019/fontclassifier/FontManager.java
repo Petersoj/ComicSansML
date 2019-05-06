@@ -24,6 +24,9 @@ public class FontManager {
         }
         FontManager.fonts = families.toArray(new String[families.size()]);
         fontIndex = result;
+        for (String font: FontManager.fonts) {
+            System.out.println("font: " + font);
+        }
     }
 
     public static String[] getFonts() {
