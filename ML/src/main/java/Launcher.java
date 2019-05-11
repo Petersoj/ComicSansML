@@ -55,6 +55,10 @@ public class Launcher extends Application {
                     lastAccuracy = eval.accuracy();
                     past_save = "fontIdentifierForChar_" + character + "_iter_ " + i + "_acc_" + lastAccuracy + ".network";
                     network.save(past_save);
+                } else {
+                    System.out.println("Did not achieve passable range, generating new set");
+                    trainingSet = generator.getSamples(character, sampleCountPerFont);
+                    System.out.println("Finished generating set, resuming training");
                 }
             }
         }

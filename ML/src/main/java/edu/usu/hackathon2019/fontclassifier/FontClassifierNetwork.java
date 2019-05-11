@@ -132,7 +132,7 @@ public class FontClassifierNetwork {
                 .activation(Activation.RELU)
                 .weightInit(WeightInit.XAVIER)
 //                .gradientNormalization(GradientNormalization.ClipL2PerLayer)
-                .gradientNormalization(GradientNormalization.ClipL2PerParamType)
+                .gradientNormalization(GradientNormalization.None)
 
 //                .weightNoise(new WeightNoise(new TruncatedNormalDistribution(6 * FontClassifierConfig.l2, FontClassifierConfig.learningRate / 10), true))
 //                .updater(
@@ -201,7 +201,7 @@ public class FontClassifierNetwork {
     private static SubsamplingLayer maxPool(String name, int[] kernel) {
         return new SubsamplingLayer.Builder(kernel, new int[]{2,2})
 //                .constrainWeights(new MinMaxNormConstraint(0.01, 10, 3))
-//                .constrainAllParameters(new MinMaxNormConstraint(0.0000000005, Double.MAX_VALUE, 3))f
+//                .constrainAllParameters(new MinMaxNormConstraint(0.0000000005, Double.MAX_VALUE, 3))
                 .name(name).build();
     }
 }
